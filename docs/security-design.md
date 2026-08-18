@@ -263,6 +263,12 @@ Rollbaserad auktorisering ska kombineras med kontroll av resursägarskap.
 
 En användare med rollen `Resident` ska exempelvis inte kunna komma åt en annan Residents felanmälan bara för att användaren har en giltig access-token.
 
+Rolltilldelningen ska senare verifieras genom tester mot API:t.
+
+Förutom att verifiera att tillåtna operationer fungerar ska negativa tester genomföras. Exempelvis ska en Resident inte kunna utföra operationer som kräver rollen `PropertyManager`.
+
+Resultatet av dessa tester ska dokumenteras och användas som underlag för säkerhetsanalysen.
+
 ### Applikationsroller och Azure RBAC
 
 Microsoft Entra App Roles och Azure RBAC används för olika syften.
@@ -272,6 +278,21 @@ App Roles används för att styra vad en användare får göra i själva Fastigh
 Azure RBAC används för att styra vilka behörigheter identiteter har till Azure-resurser.
 
 Dessa behörighetsmodeller ska därför hållas separerade.
+
+### Testanvändare och rolltilldelning
+
+Två testanvändare har skapats i Microsoft Entra ID för att kunna demonstrera och verifiera API:ts behörighetsmodell:
+
+| Användare | Applikation | App Role |
+|---|---|---|
+| Kalle | Fastighetsskötsel.Api | Resident |
+| Stina | Fastighetsskötsel.Api | PropertyManager |
+
+Kalle har endast tilldelats rollen `Resident` och Stina har endast tilldelats rollen `PropertyManager`.
+
+Grupper används inte för rolltilldelningen eftersom den aktuella Microsoft Entra-licensen inte stöder gruppbaserad tilldelning till företagsprogram. Individuell tilldelning är tillräcklig för projektets två demonstrationsanvändare.
+
+Den separata rolltilldelningen gör det möjligt att testa både tillåtna och nekade operationer för respektive användarroll.
 
 ### Identitet från access-token
 
