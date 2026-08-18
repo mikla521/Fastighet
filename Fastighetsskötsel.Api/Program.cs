@@ -4,10 +4,10 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+#region Add services to the container
 builder.Services
-    .AddAuthentication("Bearer")
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+.AddAuthentication("Bearer")
+.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddControllers();
 
@@ -61,12 +61,12 @@ builder.Services.AddOpenApi("v1", options =>
 
         return Task.CompletedTask;
     });
-});
+}); 
+#endregion
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
+#region Configure OpenApi - Scalar
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -98,7 +98,7 @@ if (app.Environment.IsDevelopment())
         };
     });
 }
-
+#endregion
 
 app.UseHttpsRedirection();
 

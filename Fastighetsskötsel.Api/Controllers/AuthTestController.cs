@@ -9,7 +9,7 @@ namespace Fastighetsskötsel.Api.Controllers;
 public class AuthTestController : ControllerBase
 {
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = "Resident")]
     public IActionResult Get()
     {
         return Ok("Autentisering fungerar.");
