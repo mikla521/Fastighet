@@ -371,3 +371,21 @@ För varje område ska rapporten beskriva:
 3. Hur åtgärden bidrar till säkerheten.
 4. Eventuella begränsningar.
 5. Möjliga förbättringar eller ytterligare säkerhetsåtgärder.
+
+## 11. Verifiering av autentisering
+
+En första verifiering av API:ts autentisering har genomförts med Scalar.
+
+Endpoint:
+
+`GET /api/AuthTest`
+
+Endpointen är skyddad med `[Authorize]`.
+
+När endpointen anropas utan en giltig access-token returnerar API:t:
+
+`401 Unauthorized`
+
+Det visar att API:t kräver autentisering innan endpointen kan användas.
+
+Detta test verifierar autentiseringslagret men testar ännu inte applikationsrollerna. Nästa steg är därför att anropa API:t med en giltig access-token och därefter verifiera att rollerna `Resident` och `PropertyManager` används korrekt för auktorisering.
