@@ -215,22 +215,71 @@ Utgångsläget ska alltså vara att åtkomst och förändringar är begränsade,
 
 ## 7. Identitetshantering och behörigheter
 
-Microsoft Entra ID ska användas för autentisering av användare.
+Microsoft Entra ID används för autentisering av användare till API:t.
 
-API:t ska validera access tokens som utfärdats av Microsoft Entra ID.
+En Appregistrering med namnet `Fastighetsskötsel.Api` har skapats i den privata Microsoft Entra-tenant som används för projektet.
 
-Två applikationsroller ska användas:
+API:t har två applikationsroller:
 
 - `Resident`
 - `PropertyManager`
 
-Rollerna ska användas för att styra åtkomsten till API:ts endpoints.
+Rollerna är definierade som Microsoft Entra App Roles och kan tilldelas till användare eller grupper.
 
-Entra ID:s `oid`-claim ska användas för att identifiera den autentiserade användaren och koppla användaren till de felanmälningar som denne har skapat.
+### Resident
+
+Rollen `Resident` representerar en boende.
+
+En användare med rollen ska kunna:
+
+- skapa en felanmälan
+- hämta egna felanmälningar
+- uppdatera egna felanmälningar enligt API:ts regler
+
+Rollen ska inte ge åtkomst till andra boendes felanmälningar eller administrativa funktioner.
+
+### PropertyManager
+
+Rollen `PropertyManager` representerar en fastighetsskötare.
+
+En användare med rollen ska kunna:
+
+- hämta alla felanmälningar
+- hämta en specifik felanmälan
+- uppdatera felanmälningar enligt API:ts regler
+- ändra status enligt den definierade statuslivscykeln
+- radera felanmälningar
+
+### Rollbaserad auktorisering
+
+API:t ska använda informationen i access-token för att avgöra vilken applikationsroll den autentiserade användaren har.
+
+Rollvärdena är:
+
+- `Resident`
+- `PropertyManager`
 
 Rollbaserad auktorisering ska kombineras med kontroll av resursägarskap.
 
-Azure RBAC ska användas separat för att styra åtkomst till Azure-resurser. Applikationsrollerna `Resident` och `PropertyManager` ska inte blandas ihop med Azure RBAC-roller.
+En användare med rollen `Resident` ska exempelvis inte kunna komma åt en annan Residents felanmälan bara för att användaren har en giltig access-token.
+
+### Applikationsroller och Azure RBAC
+
+Microsoft Entra App Roles och Azure RBAC används för olika syften.
+
+App Roles används för att styra vad en användare får göra i själva Fastighetsskötsel API.
+
+Azure RBAC används för att styra vilka behörigheter identiteter har till Azure-resurser.
+
+Dessa behörighetsmodeller ska därför hållas separerade.
+
+### Identitet från access-token
+
+API:t ska använda användarens identitet från den validerade access-token.
+
+`oid`-claimen ska användas som identifierare för användaren och ligga till grund för kopplingen mellan användaren och dennes felanmälningar.
+
+Klienten ska inte själv kunna ange en annan användares identitet för att få åtkomst till den användarens data.
 
 ---
 
