@@ -66,40 +66,39 @@ builder.Services.AddOpenApi("v1", options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
-    if (app.Environment.IsDevelopment())
+    app.MapOpenApi();
+
+    app.MapScalarApiReference(options =>
     {
-        app.MapOpenApi();
-
-        app.MapScalarApiReference(options =>
+        options.Authentication = new ScalarAuthenticationOptions
         {
-            options.Authentication = new ScalarAuthenticationOptions
+            PreferredSecuritySchemes = ["oauth2"],
+
+            SecuritySchemes = new Dictionary<string, ScalarSecurityScheme>
             {
-                PreferredSecuritySchemes = ["oauth2"],
-
-                SecuritySchemes = new Dictionary<string, ScalarSecurityScheme>
+                ["oauth2"] = new ScalarOAuth2SecurityScheme
                 {
-                    ["oauth2"] = new ScalarOAuth2SecurityScheme
-                    {
-                        DefaultScopes =
-                        [
-                            $"api://{builder.Configuration["Entra:ApiClientId"]}/access_as_user"
-                        ],
+                    DefaultScopes =
+                    [
+                        $"api://{builder.Configuration["Entra:ApiClientId"]}/access_as_user"
+                    ],
 
-                        Flows = new ScalarFlows
+                    Flows = new ScalarFlows
+                    {
+                        AuthorizationCode = new AuthorizationCodeFlow
                         {
-                            AuthorizationCode = new AuthorizationCodeFlow
-                            {
-                                ClientId = builder.Configuration["Entra:TestClientId"]
-                            }
+                            ClientId = builder.Configuration["Entra:TestClientId"]
                         }
                     }
                 }
-            };
-        });
-    }
+            }
+        };
+    });
 }
+
 
 app.UseHttpsRedirection();
 
