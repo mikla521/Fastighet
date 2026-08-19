@@ -1,10 +1,34 @@
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+using Fastighetsskötsel.Api.Data;
+using Fastighetsskötsel.Api.Data.Repositories;
+using Fastighetsskötsel.Api.Data.Repositories.Interfaces;
+using Fastighetsskötsel.Api.Services;
+using Fastighetsskötsel.Api.Services.Interfaces;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
+
+if (!string.IsNullOrWhiteSpace(keyVaultUri))
+{
+    builder.Configuration.AddAzureKeyVault(
+        new Uri(keyVaultUri),
+        new DefaultAzureCredential());
+}
+
 #region Add services to the container
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IFaultReportRepository, FaultReportRepository>();
+builder.Services.AddScoped<IFaultReportService, FaultReportService>();
+builder.Services.AddScoped<ISMSNotifyer, SMSNotifyer>();
+
 builder.Services
 .AddAuthentication("Bearer")
 .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
