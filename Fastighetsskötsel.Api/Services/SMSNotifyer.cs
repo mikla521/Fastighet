@@ -25,6 +25,8 @@ public class SMSNotifyer : ISMSNotifyer
         }
 
         // Fiktivt SMS-anrop
+        // Anropa SMS-leverantören, skicka med nyckel
+
         await Task.CompletedTask;
     }
 }

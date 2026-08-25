@@ -2,6 +2,7 @@
 using Fastighetsskötsel.Api.Data.Entities;
 using Fastighetsskötsel.Api.Data.Repositories.Interfaces;
 using Fastighetsskötsel.Api.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Fastighetsskötsel.Api.Services;
 
@@ -10,14 +11,16 @@ public class FaultReportService : IFaultReportService
     #region Dependencies
     private readonly IFaultReportRepository _repository;
     private readonly ISMSNotifyer _smsNotifyer;
+    private readonly ILogger<FaultReportService> _logger;
     #endregion
 
     #region Constructor
-    public FaultReportService(IFaultReportRepository repository, ISMSNotifyer smsNotifyer)
+    public FaultReportService(IFaultReportRepository repository, ISMSNotifyer smsNotifyer, ILogger<FaultReportService> logger)
     {
         _repository = repository;
         _smsNotifyer = smsNotifyer;
-    } 
+        _logger = logger;
+    }
     #endregion
 
     public async Task<FaultReportDto> CreateAsync(FaultReportCreateDto dto, string createdBy)
@@ -32,7 +35,18 @@ public class FaultReportService : IFaultReportService
 
         var createdReport = await _repository.CreateAsync(faultReport);
 
-        await _smsNotifyer.NotifyAsync($"Ny felanmälan skapad: {createdReport.Description}");
+        try
+        {
+            await _smsNotifyer.NotifyAsync(
+                $"Ny felanmälan skapad: {createdReport.Description}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Kunde inte skicka SMS-notifiering för felanmälan {FaultReportId}.",
+                createdReport.Id);
+        }
 
         return MapToDto(createdReport);
     }

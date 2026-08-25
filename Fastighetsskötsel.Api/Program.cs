@@ -8,6 +8,7 @@ using Fastighetsskötsel.Api.Data.Repositories.Interfaces;
 using Fastighetsskötsel.Api.Services;
 using Fastighetsskötsel.Api.Services.Interfaces;
 using Azure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +31,7 @@ builder.Services.AddScoped<IFaultReportService, FaultReportService>();
 builder.Services.AddScoped<ISMSNotifyer, SMSNotifyer>();
 
 builder.Services
-.AddAuthentication("Bearer")
+.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddControllers();
