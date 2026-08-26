@@ -23,7 +23,7 @@ public class FaultReportsController : ControllerBase
 
     #region POST
     [HttpPost]
-    [Authorize(Roles = "Resident")]
+    [Authorize(Roles = "Resident,PropertyManager")]
     public async Task<ActionResult<FaultReportDto>> Create(FaultReportCreateDto dto)
     {
         var objectId = User.FindFirst(
@@ -88,9 +88,7 @@ public class FaultReportsController : ControllerBase
     #region PATCH
     [HttpPatch("{id:int}")]
     [Authorize(Roles = "PropertyManager")]
-    public async Task<ActionResult<FaultReportDto>> Update(
-int id,
-FaultReportUpdateDto dto)
+    public async Task<ActionResult<FaultReportDto>> Update(int id, FaultReportUpdateDto dto)
     {
         var faultReport = await _service.UpdateAsync(id, dto);
 
